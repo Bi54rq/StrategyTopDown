@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
         Round += 1;
         EnterSetup($"Win! +{winGoldReward} gold. Round {Round}.");
     }
-
+    
     private void OnLose()
     {
         EnterSetup("Defeat. Back to setup (prototype reset).");
@@ -82,7 +82,7 @@ public class GameManager : MonoBehaviour
 
     private int CountAlive(Team team)
     {
-        var units = FindObjectsOfType<Unit>();
+        var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         int count = 0;
 
         for (int i = 0; i < units.Length; i++)
