@@ -1,16 +1,116 @@
+using TMPro;
 using UnityEngine;
+
+public enum GamePhase { Setup, Combat }
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static GameManager Instance { get; private set; }
+
+    public PlacementManager placementManager;
+    public ShopManager shopManager;
+
+    public TextMeshProUGUI goldText;
+    public TextMeshProUGUI roundText;
+    public TextMeshProUGUI statusText;
+
+    public int startingGold = 5;
+    public int winGoldReward = 3;
+
+    public int Gold { get; private set; }
+    public int Round { get; private set; }
+    public GamePhase Phase { get; private set; }
+
+    private void Awake()
     {
-        
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        Gold = startingGold;
+        Round = 1;
+        EnterSetup("Setup phase: buy + place units.");
+    }
+
+    private void Update()
+    {
+        UpdateUI();
+
+        if (Phase == GamePhase.Combat)
+        {
+            int playerAlive = CountAlive(Team.Player);
+            int enemyAlive = CountAlive(Team.Enemy);
+
+            if (playerAlive == 0 || enemyAlive == 0)
+            {
+                if (enemyAlive == 0) OnWin();
+                else OnLose();
+            }
+        }
+    }
+
+    public void PressBattle()
+    {
+        if (Phase != GamePhase.Setup) return;
+
+        Phase = GamePhase.Combat;
+        placementManager.StartCombat();
+        SetStatus("Combat started.");
+    }
+
+    private void OnWin()
+    {
+        Gold += winGoldReward;
+        Round += 1;
+        EnterSetup($"Win! +{winGoldReward} gold. Round {Round}.");
+    }
+
+    private void OnLose()
+    {
+        EnterSetup("Defeat. Back to setup (prototype reset).");
+    }
+
+    private void EnterSetup(string message)
+    {
+        Phase = GamePhase.Setup;
+        placementManager.EndCombat();
+        shopManager.RerollFree();
+        SetStatus(message);
+    }
+
+    private int CountAlive(Team team)
+    {
+        var units = FindObjectsOfType<Unit>();
+        int count = 0;
+
+        for (int i = 0; i < units.Length; i++)
+        {
+            if (units[i] == null) continue;
+            if (units[i].IsDead) continue;
+            if (units[i].team == team) count++;
+        }
+
+        return count;
+    }
+
+    public bool TrySpendGold(int amount)
+    {
+        if (amount <= 0) return true;
+        if (Gold < amount) return false;
+        Gold -= amount;
+        return true;
+    }
+
+    private void UpdateUI()
+    {
+        if (goldText != null) goldText.text = $"Gold: {Gold}";
+        if (roundText != null) roundText.text = $"Round: {Round}";
+    }
+
+    public void SetStatus(string msg)
+    {
+        if (statusText != null) statusText.text = msg;
     }
 }

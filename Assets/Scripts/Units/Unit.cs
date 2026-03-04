@@ -33,6 +33,7 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance != null && GameManager.Instance.Phase != GamePhase.Combat) return;
         if (IsDead) return;
 
         if (_cooldown > 0f)

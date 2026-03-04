@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -6,20 +7,25 @@ public class PlacementManager : MonoBehaviour
     public LayerMask placementLayer;
     public Collider playerZone;
 
-    public GameObject fighterPrefab;
-    public GameObject tankPrefab;
-    public GameObject rangedPrefab;
-    public GameObject supportPrefab;
-
     private GameObject _selectedPrefab;
     private bool _combatActive;
 
+    private readonly Queue<GameObject> _queuedPrefabs = new Queue<GameObject>();
+
     public bool CombatActive => _combatActive;
 
-    public void SelectFighter() => _selectedPrefab = fighterPrefab;
-    public void SelectTank() => _selectedPrefab = tankPrefab;
-    public void SelectRanged() => _selectedPrefab = rangedPrefab;
-    public void SelectSupport() => _selectedPrefab = supportPrefab;
+    public void SelectToPlace(GameObject prefab)
+    {
+        if (prefab == null) return;
+
+        if (_combatActive)
+        {
+            _queuedPrefabs.Enqueue(prefab);
+            return;
+        }
+
+        _selectedPrefab = prefab;
+    }
 
     public void StartCombat()
     {
@@ -30,14 +36,18 @@ public class PlacementManager : MonoBehaviour
     public void EndCombat()
     {
         _combatActive = false;
+
+        if (_selectedPrefab == null && _queuedPrefabs.Count > 0)
+            _selectedPrefab = _queuedPrefabs.Dequeue();
+    }
+
+    public void CancelPlacement()
+    {
+        _selectedPrefab = null;
     }
 
     private void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.E))
-            EndCombat();
-
         if (_combatActive) return;
         if (_selectedPrefab == null) return;
 
@@ -48,11 +58,18 @@ public class PlacementManager : MonoBehaviour
 
             Vector3 pos = hit.point;
 
-            if (playerZone != null && !playerZone.bounds.Contains(pos))
-                return;
+            if (playerZone != null)
+            {
+                Vector3 closest = playerZone.ClosestPoint(pos);
+                if ((closest - pos).sqrMagnitude > 0.0001f)
+                    return;
+            }
 
             Instantiate(_selectedPrefab, pos, Quaternion.identity);
             _selectedPrefab = null;
+
+            if (_queuedPrefabs.Count > 0)
+                _selectedPrefab = _queuedPrefabs.Dequeue();
         }
     }
 }
