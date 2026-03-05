@@ -9,7 +9,6 @@ public class Unit : MonoBehaviour
     public GameObject healthBarPrefab;
 
     private HealthBar _hb;
-    private float _homePosY;
     private Vector3 _homePos;
     private Quaternion _homeRot;
     private bool _hasHome;
@@ -40,11 +39,17 @@ public class Unit : MonoBehaviour
 
         if (healthBarPrefab != null)
         {
-            GameObject hb = Instantiate(healthBarPrefab);
-            _hb = hb.GetComponent<HealthBar>();
+            GameObject hb = Instantiate(healthBarPrefab, transform);
+            hb.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+            hb.transform.localRotation = Quaternion.identity;
+
+            _hb = hb.GetComponentInChildren<HealthBar>(true);
+
             if (_hb != null)
             {
-                _hb.Init(transform, Camera.main);
+                Camera c = Camera.main;
+                if (c == null) c = FindFirstObjectByType<Camera>();
+                _hb.Init(transform, c);
                 _hb.Set01(CurrentHP / Mathf.Max(0.0001f, maxHP));
             }
         }
@@ -188,7 +193,7 @@ public class Unit : MonoBehaviour
         transform.rotation = _homeRot;
 
         var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
-        if (agent != null)
+        if (agent != null && agent.isOnNavMesh)
         {
             agent.ResetPath();
             agent.velocity = Vector3.zero;

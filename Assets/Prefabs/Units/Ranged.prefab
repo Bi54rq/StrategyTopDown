@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2d95f2759c920042a736082da50b84a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
-  healthBarPrefab: {fileID: 0}
+  healthBarPrefab: {fileID: 308893857242989132, guid: da0110989b972134bbcf00ba0a666d2d, type: 3}
   team: 0
   unitClass: 2
   maxHP: 8
