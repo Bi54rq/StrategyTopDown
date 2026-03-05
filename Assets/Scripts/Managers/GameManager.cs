@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
+    public EnemySpawner enemySpawner;
     public PlacementManager placementManager;
     public ShopManager shopManager;
 
@@ -55,6 +56,9 @@ public class GameManager : MonoBehaviour
     {
         if (Phase != GamePhase.Setup) return;
 
+        if (enemySpawner != null)
+            enemySpawner.SpawnForRound(Round);
+
         Phase = GamePhase.Combat;
         placementManager.StartCombat();
         SetStatus("Combat started.");
@@ -74,6 +78,7 @@ public class GameManager : MonoBehaviour
 
     private void EnterSetup(string message)
     {
+        if (enemySpawner != null) enemySpawner.ClearEnemies();
         Phase = GamePhase.Setup;
         placementManager.EndCombat();
         shopManager.RerollFree();
