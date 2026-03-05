@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PlacementManager : MonoBehaviour
 {
@@ -65,7 +66,19 @@ public class PlacementManager : MonoBehaviour
                     return;
             }
 
-            Instantiate(_selectedPrefab, pos, Quaternion.identity);
+            GameObject go = Instantiate(_selectedPrefab, pos, Quaternion.identity);
+
+            var agent = go.GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                NavMeshHit navHit;
+                if (NavMesh.SamplePosition(go.transform.position, out navHit, 2f, NavMesh.AllAreas))
+                {
+                    go.transform.position = navHit.position;
+                    agent.Warp(navHit.position);
+                }
+            }
+
             _selectedPrefab = null;
 
             if (_queuedPrefabs.Count > 0)

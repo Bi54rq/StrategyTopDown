@@ -6,7 +6,10 @@ public enum UnitClass { Fighter, Tank, Ranged, Support }
 
 public class Unit : MonoBehaviour
 {
+    public GameObject healthBarPrefab;
 
+    private HealthBar _hb;
+    private float _homePosY;
     private Vector3 _homePos;
     private Quaternion _homeRot;
     private bool _hasHome;
@@ -34,6 +37,17 @@ public class Unit : MonoBehaviour
     {
         CurrentHP = maxHP;
         _cooldown = 0f;
+
+        if (healthBarPrefab != null)
+        {
+            GameObject hb = Instantiate(healthBarPrefab);
+            _hb = hb.GetComponent<HealthBar>();
+            if (_hb != null)
+            {
+                _hb.Init(transform, Camera.main);
+                _hb.Set01(CurrentHP / Mathf.Max(0.0001f, maxHP));
+            }
+        }
     }
 
     private void Update()
@@ -86,6 +100,8 @@ public class Unit : MonoBehaviour
         if (amount <= 0f) return;
 
         CurrentHP -= amount;
+        if (_hb != null) _hb.Set01(CurrentHP / Mathf.Max(0.0001f, maxHP));
+
         if (CurrentHP <= 0f)
             Die();
     }
@@ -96,19 +112,23 @@ public class Unit : MonoBehaviour
         if (amount <= 0f) return;
 
         CurrentHP = Mathf.Min(maxHP, CurrentHP + amount);
+        if (_hb != null) _hb.Set01(CurrentHP / Mathf.Max(0.0001f, maxHP));
     }
 
     private void Die()
     {
         if (IsDead) return;
         IsDead = true;
+
+        if (_hb != null) Destroy(_hb.gameObject);
+
         OnDied?.Invoke(this);
         Destroy(gameObject);
     }
 
     private Unit FindBestTarget()
     {
-        Unit[] all = FindObjectsOfType<Unit>();
+        Unit[] all = FindObjectsByType<Unit>(FindObjectsSortMode.None);
 
         Unit best = null;
         float bestDist = float.MaxValue;
@@ -152,6 +172,7 @@ public class Unit : MonoBehaviour
 
         return target.team != this.team;
     }
+
     public void RecordHome()
     {
         _homePos = transform.position;
