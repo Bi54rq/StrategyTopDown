@@ -51,7 +51,7 @@ public class ShopManager : MonoBehaviour
             slots[i].SetOffer(offerPool[idx], this);
         }
 
-        gameManager.SetStatus(paid ? $"Rerolled (-{rerollCost} gold)." : "New round shop reroll.");
+        gameManager.SetStatus(paid ? $"Rerolled (-{rerollCost} gold)." : "New round shop rerolled.");
     }
 
     public void BuyFromSlot(ShopSlot slot)

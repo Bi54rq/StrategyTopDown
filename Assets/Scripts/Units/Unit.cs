@@ -6,6 +6,11 @@ public enum UnitClass { Fighter, Tank, Ranged, Support }
 
 public class Unit : MonoBehaviour
 {
+
+    private Vector3 _homePos;
+    private Quaternion _homeRot;
+    private bool _hasHome;
+
     public Team team = Team.Player;
     public UnitClass unitClass = UnitClass.Fighter;
 
@@ -146,5 +151,26 @@ public class Unit : MonoBehaviour
         }
 
         return target.team != this.team;
+    }
+    public void RecordHome()
+    {
+        _homePos = transform.position;
+        _homeRot = transform.rotation;
+        _hasHome = true;
+    }
+
+    public void ReturnHome()
+    {
+        if (!_hasHome) return;
+
+        transform.position = _homePos;
+        transform.rotation = _homeRot;
+
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
     }
 }

@@ -56,6 +56,15 @@ public class GameManager : MonoBehaviour
     {
         if (Phase != GamePhase.Setup) return;
 
+        var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
+        for (int i = 0; i < units.Length; i++)
+        {
+            if (units[i] == null) continue;
+            if (units[i].IsDead) continue;
+            if (units[i].team != Team.Player) continue;
+            units[i].RecordHome();
+        }
+
         if (enemySpawner != null)
             enemySpawner.SpawnForRound(Round);
 
@@ -73,12 +82,22 @@ public class GameManager : MonoBehaviour
     
     private void OnLose()
     {
-        EnterSetup("Defeat. Back to setup (prototype reset).");
+        EnterSetup("Defeat. Back to Start.");
     }
 
     private void EnterSetup(string message)
     {
         if (enemySpawner != null) enemySpawner.ClearEnemies();
+
+        var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
+        for (int i = 0; i < units.Length; i++)
+        {
+            if (units[i] == null) continue;
+            if (units[i].IsDead) continue;
+            if (units[i].team != Team.Player) continue;
+            units[i].ReturnHome();
+        }
+
         Phase = GamePhase.Setup;
         placementManager.EndCombat();
         shopManager.RerollFree();

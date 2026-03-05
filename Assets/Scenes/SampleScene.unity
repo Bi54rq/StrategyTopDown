@@ -3781,7 +3781,7 @@ MonoBehaviour:
   roundText: {fileID: 375485533}
   statusText: {fileID: 846239776}
   startingGold: 5
-  winGoldReward: 3
+  winGoldReward: 2
 --- !u!4 &1932090898
 Transform:
   m_ObjectHideFlags: 0
