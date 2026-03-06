@@ -65,9 +65,6 @@ public class GameManager : MonoBehaviour
             units[i].RecordHome();
         }
 
-        if (enemySpawner != null)
-            enemySpawner.SpawnForRound(Round);
-
         Phase = GamePhase.Combat;
         placementManager.StartCombat();
         SetStatus("Combat started.");
@@ -79,7 +76,7 @@ public class GameManager : MonoBehaviour
         Round += 1;
         EnterSetup($"Win! +{winGoldReward} gold. Round {Round}.");
     }
-    
+
     private void OnLose()
     {
         EnterSetup("Defeat. Back to Start.");
@@ -100,7 +97,11 @@ public class GameManager : MonoBehaviour
 
         Phase = GamePhase.Setup;
         placementManager.EndCombat();
-        shopManager.RerollFree();
+
+        if (shopManager != null) shopManager.RerollFree();
+
+        if (enemySpawner != null) enemySpawner.SpawnForRound(Round);
+
         SetStatus(message);
     }
 

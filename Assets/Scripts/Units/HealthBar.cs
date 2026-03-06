@@ -54,7 +54,7 @@ public class HealthBar : MonoBehaviour
 
         if (_cam != null)
         {
-            transform.forward = (_cam.transform.position - transform.position).normalized;
+            transform.rotation = _cam.transform.rotation;
         }
     }
 }
