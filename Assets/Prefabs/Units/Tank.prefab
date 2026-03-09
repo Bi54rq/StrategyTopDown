@@ -133,12 +133,12 @@ MonoBehaviour:
   targetPriority: 2
   team: 0
   unitClass: 1
-  maxHP: 20
-  damage: 2
+  maxHP: 15
+  damage: 1
   healing: 0
   moveSpeed: 3
   attackRange: 1.2
-  attacksPerSecond: 0.8
+  attacksPerSecond: 1
 --- !u!195 &1699531946980959087
 NavMeshAgent:
   m_ObjectHideFlags: 0

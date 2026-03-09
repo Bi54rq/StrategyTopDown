@@ -133,8 +133,8 @@ MonoBehaviour:
   targetPriority: 1
   team: 0
   unitClass: 2
-  maxHP: 8
-  damage: 3
+  maxHP: 7
+  damage: 1.5
   healing: 0
   moveSpeed: 3
   attackRange: 6
