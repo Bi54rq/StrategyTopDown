@@ -9,6 +9,7 @@ public class ShopOffer
     public string displayName;
     public GameObject prefab;
     public int cost;
+    public Color displayColor = Color.white;
 }
 
 public class ShopManager : MonoBehaviour
@@ -51,7 +52,7 @@ public class ShopManager : MonoBehaviour
             slots[i].SetOffer(offerPool[idx], this);
         }
 
-        gameManager.SetStatus(paid ? $"Rerolled (-{rerollCost} gold)." : "New round shop rerolled.");
+        gameManager.SetStatus(paid ? $"Rerolled (-{rerollCost} gold)." : "New round shop reroll.");
     }
 
     public void BuyFromSlot(ShopSlot slot)

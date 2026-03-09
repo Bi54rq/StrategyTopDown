@@ -7,6 +7,7 @@ public class ShopSlot : MonoBehaviour
     public Button button;
     public TextMeshProUGUI label;
     public GameObject soldOverlay;
+    public Image backgroundImage;
 
     public bool IsSold { get; private set; }
     public ShopOffer Offer { get; private set; }
@@ -21,6 +22,9 @@ public class ShopSlot : MonoBehaviour
 
         if (soldOverlay != null) soldOverlay.SetActive(false);
         if (label != null) label.text = $"{offer.displayName}\nCost {offer.cost}";
+
+        if (backgroundImage != null)
+            backgroundImage.color = offer.displayColor;
 
         if (button != null)
         {

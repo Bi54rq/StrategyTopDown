@@ -300,6 +300,7 @@ MonoBehaviour:
   button: {fileID: 236787574}
   label: {fileID: 1321598637}
   soldOverlay: {fileID: 267133668}
+  backgroundImage: {fileID: 236787575}
 --- !u!1 &267133668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1373,6 +1374,7 @@ MonoBehaviour:
   button: {fileID: 746882115}
   label: {fileID: 2113479870}
   soldOverlay: {fileID: 1328818505}
+  backgroundImage: {fileID: 746882116}
 --- !u!1 &788619609
 GameObject:
   m_ObjectHideFlags: 0
@@ -2011,6 +2013,7 @@ MonoBehaviour:
   button: {fileID: 853226318}
   label: {fileID: 980754129}
   soldOverlay: {fileID: 1612985933}
+  backgroundImage: {fileID: 853226319}
 --- !u!1 &853353622
 GameObject:
   m_ObjectHideFlags: 0
@@ -2192,6 +2195,7 @@ MonoBehaviour:
   button: {fileID: 894089386}
   label: {fileID: 1401594652}
   soldOverlay: {fileID: 1025944607}
+  backgroundImage: {fileID: 894089387}
 --- !u!1 &926124281
 GameObject:
   m_ObjectHideFlags: 0
@@ -3756,15 +3760,19 @@ MonoBehaviour:
   - displayName: Fighter
     prefab: {fileID: 3736801750121923148, guid: 18e99e4552ba7df4ab1c91cf683530f2, type: 3}
     cost: 1
+    displayColor: {r: 1, g: 0.4669811, b: 0.4669811, a: 1}
   - displayName: Tank
     prefab: {fileID: 7613120912810885182, guid: 489da30cc9fc8a844b578a0c89e29b4a, type: 3}
     cost: 2
+    displayColor: {r: 0.5664398, g: 1, b: 0.495283, a: 1}
   - displayName: Ranged
     prefab: {fileID: 6381931160757095784, guid: 0033ec8c451d3df459b59c3a861fecb0, type: 3}
     cost: 2
+    displayColor: {r: 0.48584908, g: 0.5239488, b: 1, a: 1}
   - displayName: Support
     prefab: {fileID: 1527880385736390378, guid: 9d94192b194db7d42ba9cd5e0eea953b, type: 3}
     cost: 3
+    displayColor: {r: 0.7143136, g: 0.4764151, b: 1, a: 1}
   rerollCost: 1
 --- !u!4 &1744197947
 Transform:

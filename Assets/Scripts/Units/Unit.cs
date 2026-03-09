@@ -4,10 +4,13 @@ using UnityEngine;
 public enum Team { Player, Enemy }
 public enum UnitClass { Fighter, Tank, Ranged, Support }
 
+
 public class Unit : MonoBehaviour
 {
     public GameObject healthBarPrefab;
 
+
+    public Unit CurrentTarget => _target;
     private HealthBar _hb;
     private Vector3 _homePos;
     private Quaternion _homeRot;
