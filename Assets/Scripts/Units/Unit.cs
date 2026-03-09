@@ -1,16 +1,19 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum Team { Player, Enemy }
 public enum UnitClass { Fighter, Tank, Ranged, Support }
 
-
 public class Unit : MonoBehaviour
 {
     public GameObject healthBarPrefab;
 
-    public float targetPriority = 1f;
+    public float tankTargetBiasChance = 0.65f;
+    public int nearbyTargetSampleCount = 3;
+
     public Unit CurrentTarget => _target;
+
     private HealthBar _hb;
     private Vector3 _homePos;
     private Quaternion _homeRot;
@@ -138,48 +141,76 @@ public class Unit : MonoBehaviour
     {
         Unit[] all = FindObjectsByType<Unit>(FindObjectsSortMode.None);
 
-        Unit best = null;
-        float bestDist = float.MaxValue;
+        if (IsSupport())
+        {
+            Unit bestAlly = null;
+            float bestAllyDist = float.MaxValue;
+
+            for (int i = 0; i < all.Length; i++)
+            {
+                Unit other = all[i];
+                if (other == null || other.IsDead || other == this) continue;
+                if (other.team != this.team) continue;
+                if (other.CurrentHP >= other.maxHP) continue;
+
+                float d = Vector3.Distance(transform.position, other.transform.position);
+                if (d < bestAllyDist)
+                {
+                    bestAllyDist = d;
+                    bestAlly = other;
+                }
+            }
+
+            return bestAlly;
+        }
+
+        List<Unit> enemies = new List<Unit>();
 
         for (int i = 0; i < all.Length; i++)
         {
             Unit other = all[i];
             if (other == null || other.IsDead || other == this) continue;
-
-            if (IsSupport())
-            {
-                if (other.team != this.team) continue;
-                if (other.CurrentHP >= other.maxHP) continue;
-            }
-            else
-            {
-                if (other.team == this.team) continue;
-            }
-
-            float d = Vector3.Distance(transform.position, other.transform.position);
-
-            if (IsSupport())
-            {
-                if (d < bestDist)
-                {
-                    bestDist = d;
-                    best = other;
-                }
-            }
-            else
-            {
-                float priority = Mathf.Max(0.1f, other.targetPriority);
-                float score = d / priority;
-
-                if (score < bestDist)
-                {
-                    bestDist = score;
-                    best = other;
-                }
-            }
+            if (other.team == this.team) continue;
+            enemies.Add(other);
         }
 
-        return best;
+        if (enemies.Count == 0) return null;
+
+        enemies.Sort((a, b) =>
+        {
+            float da = Vector3.Distance(transform.position, a.transform.position);
+            float db = Vector3.Distance(transform.position, b.transform.position);
+            return da.CompareTo(db);
+        });
+
+        int sampleCount = Mathf.Min(nearbyTargetSampleCount, enemies.Count);
+
+        List<Unit> nearbyTanks = new List<Unit>();
+        for (int i = 0; i < sampleCount; i++)
+        {
+            if (enemies[i].unitClass == UnitClass.Tank)
+                nearbyTanks.Add(enemies[i]);
+        }
+
+        if (nearbyTanks.Count > 0 && UnityEngine.Random.value < tankTargetBiasChance)
+        {
+            Unit nearestTank = nearbyTanks[0];
+            float bestTankDist = Vector3.Distance(transform.position, nearestTank.transform.position);
+
+            for (int i = 1; i < nearbyTanks.Count; i++)
+            {
+                float d = Vector3.Distance(transform.position, nearbyTanks[i].transform.position);
+                if (d < bestTankDist)
+                {
+                    bestTankDist = d;
+                    nearestTank = nearbyTanks[i];
+                }
+            }
+
+            return nearestTank;
+        }
+
+        return enemies[0];
     }
 
     private bool IsTargetStillValid(Unit target)
