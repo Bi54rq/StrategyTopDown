@@ -131,10 +131,55 @@ public class Unit : MonoBehaviour
         if (IsDead) return;
         IsDead = true;
 
-        if (_hb != null) Destroy(_hb.gameObject);
+        if (_hb != null)
+            _hb.gameObject.SetActive(false);
+
+        var col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = false;
+
+        var renderer = GetComponent<Renderer>();
+        if (renderer != null)
+            renderer.enabled = false;
+
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
 
         OnDied?.Invoke(this);
-        Destroy(gameObject);
+
+        if (team == Team.Enemy)
+            Destroy(gameObject);
+    }
+
+    public void Revive()
+    {
+        IsDead = false;
+        CurrentHP = maxHP;
+
+        var col = GetComponent<Collider>();
+        if (col != null)
+            col.enabled = true;
+
+        var renderer = GetComponent<Renderer>();
+        if (renderer != null)
+            renderer.enabled = true;
+
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+        }
+
+        if (_hb != null)
+        {
+            _hb.gameObject.SetActive(true);
+            _hb.Set01(1f);
+        }
     }
 
     private Unit FindBestTarget()

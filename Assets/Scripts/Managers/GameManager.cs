@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-public enum GamePhase { Setup, Combat }
+public enum GamePhase { Setup, Combat, GameOver }
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI roundText;
     public TextMeshProUGUI statusText;
+    public TextMeshProUGUI phaseText;
 
     public int startingGold = 5;
     public int winGoldReward = 3;
@@ -24,7 +25,12 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
     }
 
@@ -32,23 +38,28 @@ public class GameManager : MonoBehaviour
     {
         Gold = startingGold;
         Round = 1;
-        EnterSetup("Setup phase: buy + place units.");
+        EnterSetup("Setup phase: buy, place, and plan against the enemy.");
     }
 
     private void Update()
     {
         UpdateUI();
 
-        if (Phase == GamePhase.Combat)
-        {
-            int playerAlive = CountAlive(Team.Player);
-            int enemyAlive = CountAlive(Team.Enemy);
+        if (Phase != GamePhase.Combat) return;
 
-            if (playerAlive == 0 || enemyAlive == 0)
-            {
-                if (enemyAlive == 0) OnWin();
-                else OnLose();
-            }
+        int playerAlive = CountAlive(Team.Player);
+        int enemyAlive = CountAlive(Team.Enemy);
+
+        if (enemyAlive <= 0)
+        {
+            OnWin();
+            return;
+        }
+
+        if (playerAlive <= 0)
+        {
+            OnLose();
+            return;
         }
     }
 
@@ -56,12 +67,20 @@ public class GameManager : MonoBehaviour
     {
         if (Phase != GamePhase.Setup) return;
 
+        int enemyAlive = CountAlive(Team.Enemy);
+        if (enemyAlive <= 0)
+        {
+            SetStatus("No enemy preview spawned.");
+            return;
+        }
+
         var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         for (int i = 0; i < units.Length; i++)
         {
             if (units[i] == null) continue;
-            if (units[i].IsDead) continue;
             if (units[i].team != Team.Player) continue;
+            if (units[i].IsDead) continue;
+
             units[i].RecordHome();
         }
 
@@ -79,28 +98,34 @@ public class GameManager : MonoBehaviour
 
     private void OnLose()
     {
-        EnterSetup("Defeat. Back to Start.");
+        Phase = GamePhase.GameOver;
+        placementManager.StartCombat();
+        SetStatus("Game Over");
     }
 
     private void EnterSetup(string message)
     {
-        if (enemySpawner != null) enemySpawner.ClearEnemies();
+        if (enemySpawner != null)
+            enemySpawner.ClearEnemies();
 
         var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         for (int i = 0; i < units.Length; i++)
         {
             if (units[i] == null) continue;
-            if (units[i].IsDead) continue;
             if (units[i].team != Team.Player) continue;
+
+            units[i].Revive();
             units[i].ReturnHome();
         }
 
         Phase = GamePhase.Setup;
         placementManager.EndCombat();
 
-        if (shopManager != null) shopManager.RerollFree();
+        if (shopManager != null)
+            shopManager.RerollFree();
 
-        if (enemySpawner != null) enemySpawner.SpawnForRound(Round);
+        if (enemySpawner != null)
+            enemySpawner.SpawnForRound(Round);
 
         SetStatus(message);
     }
@@ -124,6 +149,7 @@ public class GameManager : MonoBehaviour
     {
         if (amount <= 0) return true;
         if (Gold < amount) return false;
+
         Gold -= amount;
         return true;
     }
@@ -132,6 +158,7 @@ public class GameManager : MonoBehaviour
     {
         if (goldText != null) goldText.text = $"Gold: {Gold}";
         if (roundText != null) roundText.text = $"Round: {Round}";
+        if (phaseText != null) phaseText.text = $"Phase: {Phase}";
     }
 
     public void SetStatus(string msg)
