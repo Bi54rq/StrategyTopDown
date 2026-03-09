@@ -9,7 +9,7 @@ public class Unit : MonoBehaviour
 {
     public GameObject healthBarPrefab;
 
-
+    public float targetPriority = 1f;
     public Unit CurrentTarget => _target;
     private HealthBar _hb;
     private Vector3 _homePos;
@@ -157,10 +157,25 @@ public class Unit : MonoBehaviour
             }
 
             float d = Vector3.Distance(transform.position, other.transform.position);
-            if (d < bestDist)
+
+            if (IsSupport())
             {
-                bestDist = d;
-                best = other;
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    best = other;
+                }
+            }
+            else
+            {
+                float priority = Mathf.Max(0.1f, other.targetPriority);
+                float score = d / priority;
+
+                if (score < bestDist)
+                {
+                    bestDist = score;
+                    best = other;
+                }
             }
         }
 

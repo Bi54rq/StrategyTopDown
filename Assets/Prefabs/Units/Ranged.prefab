@@ -130,6 +130,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   healthBarPrefab: {fileID: 308893857242989132, guid: da0110989b972134bbcf00ba0a666d2d, type: 3}
+  targetPriority: 1
   team: 0
   unitClass: 2
   maxHP: 8
