@@ -2045,6 +2045,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1443483027}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &862735161
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 862735163}
+  - component: {fileID: 862735162}
+  m_Layer: 0
+  m_Name: EnemyPreviewSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &862735162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 862735161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3df9ea04a2da0e4ea7ef80dcc36814c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPreviewSpawner
+  previewSpawnPoints:
+  - {fileID: 706746883}
+  - {fileID: 853353623}
+  - {fileID: 503510644}
+  - {fileID: 78390090}
+--- !u!4 &862735163
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 862735161}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.3481, y: 0, z: 11.78841}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &894089384
 GameObject:
   m_ObjectHideFlags: 0
@@ -3705,6 +3754,10 @@ MonoBehaviour:
   - {fileID: 1527880385736390378, guid: 9d94192b194db7d42ba9cd5e0eea953b, type: 3}
   baseEnemyCount: 2
   maxEnemyCount: 8
+  maxFightersPerRound: 0
+  maxTanksPerRound: 0
+  maxRangedPerRound: 0
+  maxSupportsPerRound: 2
 --- !u!4 &1740381459
 Transform:
   m_ObjectHideFlags: 0
@@ -3774,6 +3827,7 @@ MonoBehaviour:
     cost: 3
     displayColor: {r: 0.7143136, g: 0.4764151, b: 1, a: 1}
   rerollCost: 1
+  maxSameClassPerShop: 2
 --- !u!4 &1744197947
 Transform:
   m_ObjectHideFlags: 0
@@ -3819,11 +3873,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   enemySpawner: {fileID: 1740381458}
+  enemyPreviewSpawner: {fileID: 862735162}
   placementManager: {fileID: 801298226}
   shopManager: {fileID: 1744197946}
   goldText: {fileID: 788619611}
   roundText: {fileID: 375485533}
   statusText: {fileID: 846239776}
+  phaseText: {fileID: 0}
   startingGold: 5
   winGoldReward: 2
 --- !u!4 &1932090898
@@ -4266,3 +4322,4 @@ SceneRoots:
   - {fileID: 1744197947}
   - {fileID: 1932090898}
   - {fileID: 1740381459}
+  - {fileID: 862735163}

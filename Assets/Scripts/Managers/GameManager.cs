@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public EnemySpawner enemySpawner;
+    public EnemyPreviewSpawner enemyPreviewSpawner;
     public PlacementManager placementManager;
     public ShopManager shopManager;
 
@@ -67,12 +68,16 @@ public class GameManager : MonoBehaviour
     {
         if (Phase != GamePhase.Setup) return;
 
-        int enemyAlive = CountAlive(Team.Enemy);
-        if (enemyAlive <= 0)
+        if (enemySpawner == null || !enemySpawner.HasPreparedTeam())
         {
             SetStatus("No enemy preview spawned.");
             return;
         }
+
+        if (enemyPreviewSpawner != null)
+            enemyPreviewSpawner.ClearEnemies();
+
+        enemySpawner.SpawnPreparedRound();
 
         var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         for (int i = 0; i < units.Length; i++)
@@ -108,6 +113,9 @@ public class GameManager : MonoBehaviour
         if (enemySpawner != null)
             enemySpawner.ClearEnemies();
 
+        if (enemyPreviewSpawner != null)
+            enemyPreviewSpawner.ClearEnemies();
+
         var units = FindObjectsByType<Unit>(FindObjectsSortMode.None);
         for (int i = 0; i < units.Length; i++)
         {
@@ -125,7 +133,10 @@ public class GameManager : MonoBehaviour
             shopManager.RerollFree();
 
         if (enemySpawner != null)
-            enemySpawner.SpawnForRound(Round);
+            enemySpawner.PrepareRound(Round);
+
+        if (enemySpawner != null && enemyPreviewSpawner != null)
+            enemyPreviewSpawner.SpawnPreviewFromPlan(enemySpawner.GetPreparedTeam(), Round);
 
         SetStatus(message);
     }

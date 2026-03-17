@@ -3,14 +3,7 @@ using UnityEngine;
 
 public class EnemyPreviewSpawner : MonoBehaviour
 {
-    public Collider enemyZone;
-    public GameObject fighterPrefab;
-    public GameObject tankPrefab;
-    public GameObject rangedPrefab;
-    public GameObject supportPrefab;
-
-    public int minEnemies = 2;
-    public int maxEnemies = 4;
+    public Transform[] previewSpawnPoints;
 
     private readonly List<GameObject> _spawned = new List<GameObject>();
 
@@ -23,55 +16,53 @@ public class EnemyPreviewSpawner : MonoBehaviour
         _spawned.Clear();
     }
 
-    public void SpawnPreviewForRound(int round, int seedOffset = 0)
+    public void SpawnPreviewFromPlan(List<GameObject> plannedPrefabs, int round, int seedOffset = 0)
     {
         ClearEnemies();
-        if (enemyZone == null) return;
 
-        int seed = (round * 1000) + seedOffset;
-        var rng = new System.Random(seed);
+        if (plannedPrefabs == null || plannedPrefabs.Count == 0) return;
+        if (previewSpawnPoints == null || previewSpawnPoints.Length == 0) return;
 
-        int count = Mathf.Clamp(rng.Next(minEnemies, maxEnemies + 1), 1, 99);
+        int spCount = previewSpawnPoints.Length;
 
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < plannedPrefabs.Count; i++)
         {
-            GameObject prefab = RollPrefab(rng);
+            GameObject prefab = plannedPrefabs[i];
             if (prefab == null) continue;
 
-            Vector3 pos = RandomPointInZone(enemyZone, rng);
-            GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+            Transform sp = previewSpawnPoints[i % spCount];
+            GameObject go = Instantiate(prefab, sp.position, sp.rotation);
 
-            Unit u = go.GetComponent<Unit>();
-            if (u != null) u.team = Team.Enemy;
+            MakePreviewOnly(go);
 
             _spawned.Add(go);
         }
     }
 
-    private GameObject RollPrefab(System.Random rng)
+    private void MakePreviewOnly(GameObject go)
     {
-        int r = rng.Next(0, 100);
-        if (r < 40) return fighterPrefab;
-        if (r < 65) return tankPrefab;
-        if (r < 90) return rangedPrefab;
-        return supportPrefab;
-    }
+        Unit unit = go.GetComponent<Unit>();
+        if (unit != null)
+            Destroy(unit);
 
-    private Vector3 RandomPointInZone(Collider zone, System.Random rng)
-    {
-        Bounds b = zone.bounds;
+        AttackIndicator attackIndicator = go.GetComponent<AttackIndicator>();
+        if (attackIndicator != null)
+            Destroy(attackIndicator);
 
-        for (int tries = 0; tries < 30; tries++)
+        var agent = go.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+            Destroy(agent);
+
+        Collider[] colliders = go.GetComponentsInChildren<Collider>();
+        for (int i = 0; i < colliders.Length; i++)
         {
-            float x = Mathf.Lerp(b.min.x, b.max.x, (float)rng.NextDouble());
-            float z = Mathf.Lerp(b.min.z, b.max.z, (float)rng.NextDouble());
-            Vector3 p = new Vector3(x, b.center.y, z);
-
-            Vector3 closest = zone.ClosestPoint(p);
-            if ((closest - p).sqrMagnitude < 0.0001f)
-                return p;
+            colliders[i].enabled = false;
         }
 
-        return b.center;
+        Rigidbody[] rigidbodies = go.GetComponentsInChildren<Rigidbody>();
+        for (int i = 0; i < rigidbodies.Length; i++)
+        {
+            rigidbodies[i].isKinematic = true;
+        }
     }
 }

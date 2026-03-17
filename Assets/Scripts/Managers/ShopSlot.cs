@@ -21,6 +21,21 @@ public class ShopSlot : MonoBehaviour
         IsSold = false;
 
         if (soldOverlay != null) soldOverlay.SetActive(false);
+
+        if (offer == null)
+        {
+            if (label != null) label.text = "EMPTY";
+            if (backgroundImage != null) backgroundImage.color = Color.gray;
+
+            if (button != null)
+            {
+                button.interactable = false;
+                button.onClick.RemoveAllListeners();
+            }
+
+            return;
+        }
+
         if (label != null) label.text = $"{offer.displayName}\nCost {offer.cost}";
 
         if (backgroundImage != null)
