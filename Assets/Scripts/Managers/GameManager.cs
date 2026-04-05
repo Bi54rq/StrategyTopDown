@@ -1,6 +1,6 @@
 using TMPro;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public enum GamePhase { Setup, Combat, GameOver }
 
 public class GameManager : MonoBehaviour
@@ -104,8 +104,8 @@ public class GameManager : MonoBehaviour
     private void OnLose()
     {
         Phase = GamePhase.GameOver;
-        placementManager.StartCombat();
         SetStatus("Game Over");
+        SceneManager.LoadScene("End");
     }
 
     private void EnterSetup(string message)
