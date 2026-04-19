@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 public enum GamePhase { Setup, Combat, GameOver }
 
 public class GameManager : MonoBehaviour
@@ -96,6 +97,9 @@ public class GameManager : MonoBehaviour
 
     private void OnWin()
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayWin();
+
         Gold += winGoldReward;
         Round += 1;
         EnterSetup($"Win! +{winGoldReward} gold. Round {Round}.");
@@ -103,8 +107,23 @@ public class GameManager : MonoBehaviour
 
     private void OnLose()
     {
+        if (Phase == GamePhase.GameOver) return;
+
         Phase = GamePhase.GameOver;
         SetStatus("Game Over");
+
+        placementManager.StartCombat(); 
+
+        StartCoroutine(HandleLose());
+    }
+
+    private IEnumerator HandleLose()
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayLose();
+
+        yield return new WaitForSeconds(1.2f); 
+
         SceneManager.LoadScene("End");
     }
 

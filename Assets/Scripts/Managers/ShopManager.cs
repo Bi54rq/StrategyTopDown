@@ -107,6 +107,10 @@ public class ShopManager : MonoBehaviour
 
         placementManager.SelectToPlace(slot.Offer.prefab);
         slot.MarkSold();
+
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayBuy();
+
         gameManager.SetStatus($"Bought {slot.Offer.displayName} (-{cost} gold).");
     }
 }

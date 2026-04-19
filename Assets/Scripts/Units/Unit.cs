@@ -164,6 +164,9 @@ public class Unit : MonoBehaviour
 
     private void PerformActionOnTarget(Unit target)
     {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayAttack();
+
         if (IsSupport())
             target.Heal(healing);
         else
