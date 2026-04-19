@@ -130,7 +130,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Unit
   healthBarPrefab: {fileID: 308893857242989132, guid: da0110989b972134bbcf00ba0a666d2d, type: 3}
-  targetPriority: 1
+  tankTargetBiasChance: 0.65
+  nearbyTargetSampleCount: 3
+  hitFlashDuration: 0.15
+  hitFlashColor: {r: 1, g: 1, b: 1, a: 0.41960785}
+  attackBounceScale: 1.15
+  attackBounceSpeed: 15
   team: 0
   unitClass: 0
   maxHP: 10

@@ -12,6 +12,12 @@ public class Unit : MonoBehaviour
     public float tankTargetBiasChance = 0.65f;
     public int nearbyTargetSampleCount = 3;
 
+    [Header("Feedback")]
+    public float hitFlashDuration = 0.12f;
+    public Color hitFlashColor = Color.red;
+    public float attackBounceScale = 1.12f;
+    public float attackBounceSpeed = 12f;
+
     public Unit CurrentTarget => _target;
 
     private HealthBar _hb;
@@ -36,12 +42,26 @@ public class Unit : MonoBehaviour
     private Unit _target;
     private float _cooldown;
 
+    private Renderer _renderer;
+    private Color _originalColor;
+    private float _hitFlashTimer;
+
+    private Vector3 _baseScale;
+    private Vector3 _targetScale;
+
     public event Action<Unit> OnDied;
 
     private void Awake()
     {
         CurrentHP = maxHP;
         _cooldown = 0f;
+
+        _renderer = GetComponent<Renderer>();
+        if (_renderer != null && _renderer.material != null)
+            _originalColor = _renderer.material.color;
+
+        _baseScale = transform.localScale;
+        _targetScale = _baseScale;
 
         if (healthBarPrefab != null)
         {
@@ -63,6 +83,8 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
+        UpdateVisualFeedback();
+
         if (GameManager.Instance != null && GameManager.Instance.Phase != GamePhase.Combat) return;
         if (IsDead) return;
 
@@ -86,10 +108,53 @@ public class Unit : MonoBehaviour
             if (_cooldown <= 0f)
             {
                 PerformActionOnTarget(_target);
+                TriggerAttackBounce();
+
                 float rate = Mathf.Max(0.05f, attacksPerSecond);
                 _cooldown = 1f / rate;
             }
         }
+    }
+
+    private void UpdateVisualFeedback()
+    {
+        transform.localScale = Vector3.Lerp(
+            transform.localScale,
+            _targetScale,
+            attackBounceSpeed * Time.deltaTime
+        );
+
+        if (Vector3.Distance(transform.localScale, _targetScale) < 0.01f)
+        {
+            _targetScale = _baseScale;
+        }
+
+        if (_hitFlashTimer > 0f)
+        {
+            _hitFlashTimer -= Time.deltaTime;
+
+            if (_renderer != null && _renderer.material != null)
+                _renderer.material.color = hitFlashColor;
+
+            if (_hitFlashTimer <= 0f)
+            {
+                if (_renderer != null && _renderer.material != null)
+                    _renderer.material.color = _originalColor;
+            }
+        }
+    }
+
+    private void TriggerAttackBounce()
+    {
+        _targetScale = _baseScale * attackBounceScale;
+    }
+
+    private void TriggerHitFlash()
+    {
+        _hitFlashTimer = hitFlashDuration;
+
+        if (_renderer != null && _renderer.material != null)
+            _renderer.material.color = hitFlashColor;
     }
 
     private bool IsSupport()
@@ -111,6 +176,8 @@ public class Unit : MonoBehaviour
         if (amount <= 0f) return;
 
         CurrentHP -= amount;
+        TriggerHitFlash();
+
         if (_hb != null) _hb.Set01(CurrentHP / Mathf.Max(0.0001f, maxHP));
 
         if (CurrentHP <= 0f)
@@ -174,6 +241,13 @@ public class Unit : MonoBehaviour
             agent.ResetPath();
             agent.velocity = Vector3.zero;
         }
+
+        if (_renderer != null && _renderer.material != null)
+            _renderer.material.color = _originalColor;
+
+        transform.localScale = _baseScale;
+        _targetScale = _baseScale;
+        _hitFlashTimer = 0f;
 
         if (_hb != null)
         {
