@@ -33,6 +33,10 @@ public class EnemyPreviewSpawner : MonoBehaviour
             Transform sp = previewSpawnPoints[i % spCount];
             GameObject go = Instantiate(prefab, sp.position, sp.rotation);
 
+            Unit unit = go.GetComponent<Unit>();
+            if (unit != null)
+                unit.SetTeam(Team.Enemy);
+
             MakePreviewOnly(go);
 
             _spawned.Add(go);
@@ -43,15 +47,15 @@ public class EnemyPreviewSpawner : MonoBehaviour
     {
         Unit unit = go.GetComponent<Unit>();
         if (unit != null)
-            Destroy(unit);
+            unit.enabled = false;
 
         AttackIndicator attackIndicator = go.GetComponent<AttackIndicator>();
         if (attackIndicator != null)
-            Destroy(attackIndicator);
+            attackIndicator.enabled = false;
 
         var agent = go.GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent != null)
-            Destroy(agent);
+            agent.enabled = false;
 
         Collider[] colliders = go.GetComponentsInChildren<Collider>();
         for (int i = 0; i < colliders.Length; i++)

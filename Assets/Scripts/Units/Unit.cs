@@ -76,7 +76,9 @@ public class Unit : MonoBehaviour
                 Camera c = Camera.main;
                 if (c == null) c = FindFirstObjectByType<Camera>();
                 _hb.Init(transform, c);
+                _hb.SetTeamColor(team);
                 _hb.Set01(CurrentHP / Mathf.Max(0.0001f, maxHP));
+
             }
         }
     }
@@ -204,6 +206,10 @@ public class Unit : MonoBehaviour
         if (_hb != null)
             _hb.gameObject.SetActive(false);
 
+        AttackIndicator ai = GetComponent<AttackIndicator>();
+        if (ai != null)
+            ai.enabled = false;
+
         var col = GetComponent<Collider>();
         if (col != null)
             col.enabled = false;
@@ -255,6 +261,7 @@ public class Unit : MonoBehaviour
         if (_hb != null)
         {
             _hb.gameObject.SetActive(true);
+            _hb.SetTeamColor(team);
             _hb.Set01(1f);
         }
     }
@@ -370,4 +377,12 @@ public class Unit : MonoBehaviour
             agent.velocity = Vector3.zero;
         }
     }
+    public void SetTeam(Team newTeam)
+    {
+        team = newTeam;
+
+        if (_hb != null)
+            _hb.SetTeamColor(team);
+    }
+
 }

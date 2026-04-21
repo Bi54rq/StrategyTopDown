@@ -98,7 +98,7 @@ public class EnemySpawner : MonoBehaviour
             GameObject go = Instantiate(prefab, sp.position, Quaternion.identity);
 
             Unit u = go.GetComponent<Unit>();
-            if (u != null) u.team = Team.Enemy;
+            if (u != null) u.SetTeam(Team.Enemy);
         }
     }
 

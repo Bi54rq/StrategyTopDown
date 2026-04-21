@@ -57,4 +57,14 @@ public class HealthBar : MonoBehaviour
             transform.rotation = _cam.transform.rotation;
         }
     }
+    public void SetTeamColor(Team team)
+    {
+        if (fill == null) return;
+
+        if (team == Team.Player)
+            fill.color = Color.green;
+        else
+            fill.color = Color.red;
+    }
+
 }

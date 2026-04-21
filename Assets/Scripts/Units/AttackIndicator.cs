@@ -27,7 +27,19 @@ public class AttackIndicator : MonoBehaviour
             return;
         }
 
-        if (unit == null || unit.CurrentTarget == null || unit.CurrentTarget.IsDead)
+        if (unit == null)
+        {
+            line.enabled = false;
+            return;
+        }
+
+        if (unit.CurrentTarget == null)
+        {
+            line.enabled = false;
+            return;
+        }
+
+        if (unit.CurrentTarget.IsDead)
         {
             line.enabled = false;
             return;
@@ -43,8 +55,12 @@ public class AttackIndicator : MonoBehaviour
 
         if (unit.unitClass == UnitClass.Support)
         {
-            line.startColor = Color.green;
-            line.endColor = Color.green;
+            Color healColor = new Color(0.2f, 1f, 0.4f, 0.85f); 
+            line.startColor = healColor;
+            line.endColor = healColor;
+
+            line.startWidth = 0.08f;
+            line.endWidth = 0.08f;
         }
         else if (unit.team == Team.Player)
         {
