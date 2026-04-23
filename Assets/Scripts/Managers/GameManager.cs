@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 public enum GamePhase { Setup, Combat, GameOver }
 
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -13,6 +14,7 @@ public class GameManager : MonoBehaviour
     public PlacementManager placementManager;
     public ShopManager shopManager;
 
+    public TextMeshProUGUI roundResultText;
     public TextMeshProUGUI goldText;
     public TextMeshProUGUI roundText;
     public TextMeshProUGUI statusText;
@@ -24,6 +26,8 @@ public class GameManager : MonoBehaviour
     public int Gold { get; private set; }
     public int Round { get; private set; }
     public GamePhase Phase { get; private set; }
+
+    private bool _roundEnding;
 
     private void Awake()
     {
@@ -97,12 +101,14 @@ public class GameManager : MonoBehaviour
 
     private void OnWin()
     {
+        if (_roundEnding) return;
+
+        _roundEnding = true;
+
         if (AudioManager.Instance != null)
             AudioManager.Instance.PlayWin();
 
-        Gold += winGoldReward;
-        Round += 1;
-        EnterSetup($"Win! +{winGoldReward} gold. Round {Round}.");
+        StartCoroutine(ShowRoundWin());
     }
 
     private void OnLose()
@@ -129,6 +135,8 @@ public class GameManager : MonoBehaviour
 
     private void EnterSetup(string message)
     {
+        _roundEnding = false;
+
         if (enemySpawner != null)
             enemySpawner.ClearEnemies();
 
@@ -195,4 +203,24 @@ public class GameManager : MonoBehaviour
     {
         if (statusText != null) statusText.text = msg;
     }
+
+    private IEnumerator ShowRoundWin()
+    {
+        if (roundResultText != null)
+        {
+            roundResultText.gameObject.SetActive(true);
+            roundResultText.text = "ROUND WON!";
+        }
+
+        yield return new WaitForSeconds(1.2f);
+
+        if (roundResultText != null)
+            roundResultText.gameObject.SetActive(false);
+
+        Gold += winGoldReward;
+        Round += 1;
+
+        EnterSetup($"Win! +{winGoldReward} gold. Round {Round}.");
+    }
+
 }
