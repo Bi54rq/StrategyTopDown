@@ -2016,6 +2016,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1427888979}
   - component: {fileID: 1427888978}
+  - component: {fileID: 1427888980}
   m_Layer: 0
   m_Name: MenuManager
   m_TagString: Untagged
@@ -2050,6 +2051,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1427888980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1427888977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761107206a8e6ee448d5b643f856a573, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestSoundButton
 --- !u!1 &1521461499
 GameObject:
   m_ObjectHideFlags: 0
@@ -2287,8 +2300,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1730356087}
-        m_TargetAssemblyTypeName: AudioManager, Assembly-CSharp
+      - m_Target: {fileID: 1427888980}
+        m_TargetAssemblyTypeName: TestSoundButton, Assembly-CSharp
         m_MethodName: PlayTestSound
         m_Mode: 1
         m_Arguments:
